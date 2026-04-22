@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.PracticeAppOne" parent="Theme.MaterialComponents.Light" />
+</resources>
