@@ -91,4 +91,5 @@ dependencies {
     "ksp"(libs.moshi.kotlin.codegen)
     implementation(libs.hilt.android)
     "ksp"(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 }
