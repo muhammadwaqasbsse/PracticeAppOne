@@ -1,7 +1,181 @@
 package com.practice.stockapp.presentation.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.practice.stockapp.presentation.viewmodel.StocksViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dreammobileapps.practiceappone.R
+import com.practice.stockapp.domain.model.Stock
+import com.practice.stockapp.util.UiState
 
 @Composable
-fun StocksScreen() {
+fun StocksScreen(viewModel: StocksViewModel = hiltViewModel()) {
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
+
+    var query by remember { mutableStateOf("") }
+    val isSearching = query.isEmpty()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+
+        //search bar
+        OutlinedTextField(
+            value = query,
+            onValueChange = {
+                query = it
+                viewModel.onSearchQueryChanged(it)
+            },
+            label = { Text(stringResource(R.string.search_stocks)) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (isSearching) {
+            LazyColumn {
+                items(searchResults, key = { it.id }) { stock ->
+                    StockItem(stock)
+                }
+            }
+            return@Column
+        }
+
+        // otherwise show full list with states
+        when (val s = state) {
+            is UiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is UiState.Success -> {
+                LazyColumn {
+                    items(s.data, key = {it.id}) { stock ->
+                        StockItem(stock)
+                    }
+                }
+            }
+            is UiState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                   Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                       Text(
+                           text = s.message,
+                           style = MaterialTheme.typography.bodyMedium,
+                           color = MaterialTheme.colorScheme.error
+                       )
+                       Spacer(modifier = Modifier.height(8.dp))
+                       Button(onClick = { viewModel.loadStocks() }) {
+                           Text(
+                               text = stringResource(R.string.retry)
+                           )
+                       }
+                   }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StockItem(stock: Stock) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            //left side - avatar + name + ticker
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                //ticker avatar circle
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Text(
+                        text = stock.ticker.take(4),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+
+                Column {
+                    Text(
+                        text = stock.name,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            //right side - price + change
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = "${stock.price}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${stock.changePercent}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (stock.changePercent >= 0)
+                        Color(0xFF3B6D11) else Color(0xFF3B6D11)
+                )
+            }
+        }
+    }
 }
