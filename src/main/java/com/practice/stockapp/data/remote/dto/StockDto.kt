@@ -11,10 +11,12 @@ data class StockDto(
     @field:Json(name = "changePercent") val changePercent: Double
 )
 
-fun StockDto.toDomain() = Stock(
-    id = id,
-    name = name,
-    ticker = ticker,
-    price = price,
-    changePercent = changePercent
-)
+fun StockDto.toDomain(): Stock {
+    return Stock(
+        id = id,
+        name = name,
+        ticker = ticker,
+        price = price,
+        changePercent = changePercent
+    )
+}

@@ -13,18 +13,22 @@ data class StockEntity(
     val changePercent: Double
 )
 
-fun StockEntity.toDomain() = Stock(
-    id = id,
-    name = name,
-    ticker = ticker,
-    price = price,
-    changePercent = changePercent
-)
+fun StockEntity.toDomain(): Stock {
+    return Stock(
+        id = id,
+        name = name,
+        ticker = ticker,
+        price = price,
+        changePercent = changePercent
+    )
+}
 
-fun Stock.toEntity() = StockEntity(
-    id = id,
-    name = name,
-    ticker = ticker,
-    price = price,
-    changePercent = changePercent
-)
+fun Stock.toEntity(): StockEntity {
+    return StockEntity(
+        id = id,
+        name = name,
+        ticker = ticker,
+        price = price,
+        changePercent = changePercent
+    )
+}
