@@ -1,8 +1,8 @@
 package com.practice.stockapp.presentation.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import com.dreammobileapps.practiceappone.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -30,20 +28,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.practice.stockapp.presentation.viewmodel.StocksViewModel
-import com.dreammobileapps.practiceappone.R
 import com.practice.stockapp.domain.model.Stock
+import com.practice.stockapp.presentation.viewmodel.StocksViewModel
 import com.practice.stockapp.util.UiState
 
+@Preview(showBackground = true)
 @Composable
-fun StocksScreen(viewModel: StocksViewModel = hiltViewModel()) {
+fun StockScreenTwo(viewModel: StocksViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
 
@@ -56,7 +53,6 @@ fun StocksScreen(viewModel: StocksViewModel = hiltViewModel()) {
             .padding(16.dp)
     ) {
 
-        //Search bar
         OutlinedTextField(
             value = query,
             onValueChange = {
@@ -66,14 +62,14 @@ fun StocksScreen(viewModel: StocksViewModel = hiltViewModel()) {
             label = { Text(stringResource(R.string.search_stocks)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         if (isSearching) {
             LazyColumn {
-                items(searchResults, key = {it.id} ) { stock ->
+                items(searchResults, key = {it.id }) { stock ->
                     StockItem(stock)
                 }
             }
@@ -107,23 +103,24 @@ fun StocksScreen(viewModel: StocksViewModel = hiltViewModel()) {
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
-
                         Button(onClick = { viewModel.loadStocks() }) {
-                            Text(stringResource(R.string.retry))
+                            Text(stringResource(R.string.retry ))
                         }
                     }
                 }
             }
         }
+
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun StockItem(stock: Stock) {
+fun StockItemTwo(stock: Stock) {
     Card(
         modifier = Modifier
             .padding(4.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -132,34 +129,11 @@ fun StockItem(stock: Stock) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ){
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stock.ticker.take(4),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
+            ) {
 
-                Column {
-                    Text(
-                        text = stock.name,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        text = stock.ticker,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
             }
 
             Column(horizontalAlignment = Alignment.End) {
